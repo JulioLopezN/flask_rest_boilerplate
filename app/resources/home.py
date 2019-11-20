@@ -5,5 +5,5 @@ home_api = Blueprint('home', __name__)
 
 
 @home_api.route('/', methods=['GET'])
-def home():
+def index():
     return {'message': datetime.utcnow().isoformat()}

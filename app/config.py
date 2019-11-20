@@ -1,36 +1,36 @@
 import os
 
-# uncomment the line below for postgres database url from environment variable
-# postgres_local_base = os.environ['DATABASE_URL']
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'WUQJ877peYBn6S2T')
     DEBUG = False
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'todo.db')
 
 
 class DevelopmentConfig(Config):
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'todo.db')
+    FLASK_DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    BASE_URL = 'localhost:5000'
+    # EMAIL_HOST = 
+    # EMAIL_PORT = 
+    # EMAIL_SSL = 
+    # EMAIL_USER = 
+    # EMAIL_PASS = 
+    # EMAIL_FROM_ADDRESS = 
 
 
 class TestingConfig(Config):
     DEBUG = True
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'todo.db')
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class ProductionConfig(Config):
-    DEBUG = False
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
+    pass
 
 
 configuration = dict(
@@ -38,5 +38,3 @@ configuration = dict(
     production=ProductionConfig,
     test=TestingConfig
 )
-
-key = Config.SECRET_KEY
