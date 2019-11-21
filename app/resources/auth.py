@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, g
 from sqlalchemy.exc import IntegrityError
 from app import jwt_manager, bcrypt, ma, db, email_sender
 from app.models import User
 from app.schemas import LoginSchema, RegisterSchema
 from app.common.constants.roles import Roles
 from app.common.security.password_helpers import password_generate
+from app.common.decorators.authorized import authorized
 
 auth_api = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -64,8 +65,23 @@ def register():
 
 
 @auth_api.route('/change_password', methods=['PUT'])
+@authorized()
 def change_password():
-    raise NotImplementedError
+    model = request.json
+    user_session = g.user
+
+    user = User.query.filter_by(id_user=user_session['id_user'], active=True).first()
+    if not user or not bcrypt.check_password_hash(user.password_hash, model['old_password']):
+        return { 'error': 'invalid password' }, 400
+
+    if model['new_password'] != model['confirm_password']:
+        return { 'error': 'please confirm password correctly' }, 400
+    
+    user.password_hash = bcrypt.generate_password_hash(model['new_password'])
+    
+    db.session.commit()
+
+    return '', 204
 
 
 @auth_api.route('/reset_password', methods=['POST'])
@@ -84,8 +100,6 @@ def reset_password():
 
     db.session.commit()
 
-    # TODO: send email
-
     template = render_template('emails/reset_password.html', user=user)
     
     try:
@@ -99,7 +113,11 @@ def confirm_reset_password():
     model = request.json
 
     user = User.query \
-        .filter_by(id_user=model['id_user'], reset_password_token=model['reset_password_token'], active=True) \
+        .filter_by(
+            id_user=model['id_user'], 
+            reset_password_token=model['reset_password_token'], 
+            active=True
+        ) \
         .first()
 
     if not user:

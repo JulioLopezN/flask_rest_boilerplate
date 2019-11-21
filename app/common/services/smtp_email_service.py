@@ -1,3 +1,4 @@
+from typing import Union, Sequence
 import smtplib
 import ssl
 from email.mime.text import MIMEText
@@ -13,10 +14,10 @@ class SmtpEmailService:
         self.password = password
         self.from_address = from_address
 
-    def set_default_from_address(self, from_address):
+    def set_default_from_address(self, from_address: str):
         self.from_address = from_address
 
-    def send(self, message, to_address, from_address=None):
+    def send(self, message: Union[str, bytes], to_address: Union[str, Sequence[str]], from_address: str = None):
         if not from_address:
             from_address = self.from_address
 
@@ -27,7 +28,8 @@ class SmtpEmailService:
         context = ssl.create_default_context()
 
         if self.ssl:
-            server = smtplib.SMTP_SSL(self.hostname, self.port, context=context)
+            server = smtplib.SMTP_SSL(
+                self.hostname, self.port, context=context)
         else:
             server = smtplib.SMTP(self.hostname, self.port)
 
