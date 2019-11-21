@@ -19,7 +19,7 @@ def getAll():
 
 @todo_api.route('/<int:id>', methods=['GET'])
 def get(id):
-    entity = Model.query.filter(Model.id == id).first()
+    entity = Model.query.filter_by(id_todo=id).first()
     if entity is None:
         return {'error': 'Entity not found'}, 404
 
@@ -37,7 +37,7 @@ def add():
 
 @todo_api.route('/<int:id>', methods=['PUT'])
 def update(id):
-    entity = Model.query.filter(Model.id == id).first()
+    entity = Model.query.filter_by(id_todo=id).first()
     if entity is None:
         return {'error': 'Entity not found'}, 404
 
@@ -53,7 +53,7 @@ def update(id):
 
 @todo_api.route('/<int:id>', methods=['DELETE'])
 def delete(id):
-    entity = Model.query.filter(Model.id == id).first()
+    entity = Model.query.filter_by(id_todo=id).first()
     if entity is None:
         return {'error': 'Entity not found'}, 404
 

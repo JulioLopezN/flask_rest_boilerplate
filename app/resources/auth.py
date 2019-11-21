@@ -70,15 +70,18 @@ def change_password():
     model = request.json
     user_session = g.user
 
-    user = User.query.filter_by(id_user=user_session['id_user'], active=True).first()
+    user = User.query \
+        .filter_by(id_user=user_session['id_user'], active=True) \
+        .first()
+
     if not user or not bcrypt.check_password_hash(user.password_hash, model['old_password']):
-        return { 'error': 'invalid password' }, 400
+        return {'error': 'invalid password'}, 400
 
     if model['new_password'] != model['confirm_password']:
-        return { 'error': 'please confirm password correctly' }, 400
-    
+        return {'error': 'please confirm password correctly'}, 400
+
     user.password_hash = bcrypt.generate_password_hash(model['new_password'])
-    
+
     db.session.commit()
 
     return '', 204
@@ -101,12 +104,13 @@ def reset_password():
     db.session.commit()
 
     template = render_template('emails/reset_password.html', user=user)
-    
+
     try:
         email_sender.send(template, user.email)
         return '', 204
     except:
         return '', 503
+
 
 @auth_api.route('/confirm_reset_password', methods=['PUT'])
 def confirm_reset_password():
@@ -114,8 +118,8 @@ def confirm_reset_password():
 
     user = User.query \
         .filter_by(
-            id_user=model['id_user'], 
-            reset_password_token=model['reset_password_token'], 
+            id_user=model['id_user'],
+            reset_password_token=model['reset_password_token'],
             active=True
         ) \
         .first()
@@ -124,12 +128,12 @@ def confirm_reset_password():
         return '', 400
 
     if user.reset_password_expire < datetime.utcnow():
-        return { 'error': 'Token expired' }, 400
+        return {'error': 'Token expired'}, 400
 
     user.password_hash = bcrypt.generate_password_hash(model['password'])
     user.reset_password_token = None
     user.reset_password_expire = None
-    
+
     db.session.commit()
 
     payload = {
