@@ -13,7 +13,6 @@ class DevelopmentConfig(Config):
     DEBUG = True
     FLASK_DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    BASE_URL = 'localhost:5000'
     # EMAIL_HOST =
     # EMAIL_PORT =
     # EMAIL_SSL =
