@@ -1,0 +1,5 @@
+.vscode
+.gitignore
+.docker-compose.yml
+.docker-compose.override.yml
+README.md
